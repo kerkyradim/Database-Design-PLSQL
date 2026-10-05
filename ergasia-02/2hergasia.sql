@@ -1,0 +1,228 @@
+ALTER SESSION SET NLS_DATE_FORMAT='DD-MM-YYYY';
+
+--1o/creating the tables
+--relationship:CUSTOMERS
+CREATE TABLE CUSTOMERS AS 
+SELECT NAME,ID AS CUSTOMER_ID,GENDER,MARITAL_STATUS,INCOME_LEVEL,BIRTH_DATE
+FROM XSALES.CUSTOMERS;
+
+--add column age
+ALTER TABLE CUSTOMERS
+ADD AGE NUMBER(20);
+
+--find age for every customer
+UPDATE  CUSTOMERS
+SET AGE=(SELECT
+   EXTRACT(YEAR FROM sysdate) - EXTRACT(YEAR FROM to_date(BIRTH_DATE, 'DD-MM-YYYY'))
+   FROM dual);
+
+--add column age_group
+ALTER TABLE CUSTOMERS
+ADD AGE_GROUP VARCHAR(30);
+
+--update age_group column
+UPDATE CUSTOMERS
+SET AGE_GROUP='under 30'
+WHERE AGE<=30;
+
+UPDATE CUSTOMERS
+SET AGE_GROUP='30-40'
+WHERE AGE>30 AND AGE<=40;
+
+UPDATE CUSTOMERS
+SET AGE_GROUP='40-50'
+WHERE AGE>40 AND AGE<=50;
+
+UPDATE CUSTOMERS
+SET AGE_GROUP='50-60'
+WHERE AGE>50 AND AGE<=60;
+
+UPDATE CUSTOMERS
+SET AGE_GROUP='60-70'
+WHERE AGE>60 AND AGE<=70;
+
+UPDATE CUSTOMERS
+SET AGE_GROUP='above 70'
+WHERE AGE>70;
+
+--drop column age
+ALTER TABLE CUSTOMERS
+DROP COLUMN AGE;
+
+--find all the different values of column income level 
+--and sort them alphabetically
+SELECT INCOME_LEVEL 
+FROM CUSTOMERS
+GROUP BY INCOME_LEVEL
+ORDER BY INCOME_LEVEL;
+
+--update income level
+UPDATE CUSTOMERS 
+SET INCOME_LEVEL='high'
+WHERE  INCOME_LEVEL='J: 190,000 - 249,999'
+      OR INCOME_LEVEL='K: 250,000 - 299,999' OR INCOME_LEVEL='L: 300,000 and above';
+      
+
+UPDATE CUSTOMERS 
+SET INCOME_LEVEL='medium'
+WHERE INCOME_LEVEL='F: 110,000 - 129,999' OR INCOME_LEVEL='G: 130,000 - 149,999'
+      OR INCOME_LEVEL='H: 150,000 - 169,999' OR INCOME_LEVEL='I: 170,000 - 189,999';
+      
+UPDATE CUSTOMERS 
+SET INCOME_LEVEL='low'
+WHERE INCOME_LEVEL='A: Below 30,000' OR INCOME_LEVEL='B: 30,000 - 49,999'
+      OR INCOME_LEVEL='C: 50,000 - 69,999' OR INCOME_LEVEL='D: 70,000 - 89,999' OR
+      INCOME_LEVEL='E: 90,000 - 109,999';
+      
+UPDATE CUSTOMERS 
+SET INCOME_LEVEL='unknown'
+WHERE INCOME_LEVEL IS NULL;
+
+--find all the different values of column marital_status 
+--and sort them alphabetically
+SELECT MARITAL_STATUS 
+FROM CUSTOMERS
+GROUP BY MARITAL_STATUS
+ORDER BY MARITAL_STATUS;
+
+--update column marital_status
+UPDATE CUSTOMERS
+SET MARITAL_STATUS='married'
+WHERE MARITAL_STATUS='Married' OR MARITAL_STATUS='Mabsent'
+      OR MARITAL_STATUS='married' OR MARITAL_STATUS='Mar-AF';
+      
+UPDATE CUSTOMERS
+SET MARITAL_STATUS='single'
+WHERE MARITAL_STATUS='Divorc.' OR MARITAL_STATUS='NeverM'
+      OR MARITAL_STATUS='Separ.' OR MARITAL_STATUS='Widowed' OR
+      MARITAL_STATUS='divorced' OR MARITAL_STATUS='widow' OR 
+      MARITAL_STATUS='single';
+      
+UPDATE CUSTOMERS 
+SET MARITAL_STATUS='unknown'
+WHERE MARITAL_STATUS IS NULL;
+
+DESC CUSTOMERS;
+SELECT * FROM CUSTOMERS;
+
+
+--relationship:PRODUCTS
+--create table product from xsales
+CREATE TABLE PRODUCTS AS
+SELECT * 
+FROM XSALES.PRODUCTS;
+
+--create table categories from xsales
+CREATE TABLE CATEGORIES AS
+SELECT * 
+FROM XSALES.CATEGORIES;
+ 
+--add constraints to table products and categories in 
+--order to do the join
+ALTER TABLE CATEGORIES
+MODIFY ID PRIMARY KEY;
+
+ALTER  TABLE PRODUCTS
+ ADD CONSTRAINT fk1 FOREIGN KEY(SUBCATEGORY_REFERENCE) REFERENCES CATEGORIES (ID);
+
+--create relationship product
+CREATE TABLE product AS
+SELECT p.IDENTIFIER,p.NAME AS PRODUCTNAME,c.NAME AS CATEGORYNAME,p.LIST_PRICE
+FROM CATEGORIES c JOIN PRODUCTS p ON c.ID=p.SUBCATEGORY_REFERENCE;
+ 
+DESC product;
+SELECT * FROM product;
+
+--drop constraints in order to drop unused tables
+ALTER TABLE PRODUCTS 
+DROP CONSTRAINT fk1;
+
+--relationship:ORDERS
+CREATE TABLE ORDERS AS
+SELECT  OI.ORDER_ID,OI.PRODUCT_ID,O.CUSTOMER_ID,OI.AMOUNT AS PRICE,OI.COST,O.CHANNEL,OI.ORDER_DATE,O.ORDER_FINISHED
+FROM XSALES.ORDERS O JOIN XSALES.ORDER_ITEMS OI ON O.ID=OI.ORDER_ID;
+
+ALTER TABLE ORDERS
+ADD DAYS_TO_PROCESS NUMBER(20);
+
+--update column days_tos_process
+UPDATE ORDERS 
+SET DAYS_TO_PROCESS=ABS(ORDER_FINISHED-ORDER_DATE);
+
+--drop unsued columns
+ALTER TABLE  ORDERS
+DROP  COLUMN ORDER_FINISHED;
+
+ALTER TABLE ORDERS
+DROP COLUMN ORDER_DATE;
+
+DESC ORDERS;
+SELECT * FROM ORDERS;
+
+--3o/optimizer's analysis
+EXPLAIN PLAN FOR
+SELECT c.name, o.price, oi.quantity, p.productname
+FROM customers c JOIN orders o ON c.customer_id=o.customer_id
+                JOIN XSALES.order_items oi ON o.order_id=oi.order_id
+                JOIN product p ON oi.product_id=p.identifier
+WHERE p.productname LIKE '%DVD%'
+      AND oi.order_date BETWEEN '01-01-2000' AND '31-12-2000'
+      AND o.channel='Internet'
+ORDER BY c.name;
+
+--view optimizer's analysis
+SELECT * FROM plan_table
+START WITH id=0
+CONNECT BY PRIOR id=parent_id;
+
+
+--optimizing the query
+CREATE INDEX CINDEX ON CUSTOMERS(NAME,CUSTOMER_ID);
+
+CREATE INDEX PRODUCTINDEX ON PRODUCT(PRODUCTNAME,IDENTIFIER);
+
+CREATE INDEX ORDERINDEX ON ORDERS(ORDER_ID,CHANNEL);
+
+--4o/theoritical evaluation of cost 
+ 
+ --find the size of a relationship in blocks and bytes
+SELECT * FROM USER_SEGMENTS ;
+
+--find the size of  the relationship XSALES.ORDERS in blocks and bytes
+SELECT * 
+FROM dba_segments
+WHERE owner='XSALES';
+
+--in order to find the initial number of rows of every table that needs the query
+SELECT COUNT(*)
+FROM PRODUCT;
+
+SELECT COUNT(*) 
+FROM ORDERS O
+WHERE O.CHANNEL='Internet';
+
+SELECT COUNT(*)
+FROM XSALES.ORDER_ITEMS OI
+WHERE oi.order_date BETWEEN '01-01-2000' AND '31-12-2000';
+
+
+SELECT COUNT(*)
+FROM PRODUCT P
+WHERE p.productname LIKE '%DVD%';
+
+--find the tupples that this join returns
+SELECT COUNT(*)
+FROM ORDERS O JOIN XSALES.ORDER_ITEMS OI
+ON O.ORDER_ID=OI.ORDER_ID;
+
+--find the tupples that this join returns
+SELECT count(*)
+FROM PRODUCT p JOIN XSALES.ORDER_ITEMS oi
+ON oi.product_id=p.identifier;
+
+--find the tupples that this join returns
+SELECT COUNT(*)
+FROM CUSTOMERS c JOIN ORDERS o 
+ON c.customer_id=o.customer_id;
+
+
