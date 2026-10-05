@@ -1,0 +1,32 @@
+INSERT INTO BOOKS VALUES('Zazi in the train','Keno Pemon',12345678,'Literature');
+INSERT INTO BOOKS VALUES('Olive again','Elizabeth Straut',22445566,'Literature');
+INSERT INTO BOOKS VALUES('For the kids','James Jous',33556677,'Poetry');
+INSERT INTO BOOKS VALUES('Jermin','Tefvik Fikret',31234567,'Poetry');
+INSERT INTO BOOKS VALUES('Me and You','Loren Gaderson',78123100,'Art');
+INSERT INTO BOOKS VALUES('Music','Taxiarxos Xristopoulos',01563221,'Art');
+INSERT INTO BOOKS VALUES('The world have spirit','Fenderik Lenouat',35610290,'Philosophy');
+INSERT INTO BOOKS VALUES('To be here','Dalai Lama',31209765,'Philosophy');
+INSERT INTO BOOKS VALUES('Komninoi','Fotios Stanindis',69321560,'History');
+INSERT INTO BOOKS VALUES('Woman words','Dimitris Dimitropoulos',91256109,'History');
+
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Maria Kitsou','731 FOdren,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Jane James','638 Voss,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Michael Cors','261 Berry,Bellair,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'John Doe','5631 Flice,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Mike Eliot','975 Fire Oak,Humble,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Bill Xronis','980 Dallas,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Jane Eyer','450 Stone,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Simeon Heitz','632 Katy,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Kathrin Palm','879 Jefferson,Houston,TX');
+INSERT INTO MEMBERS VALUES(members_seq.nextval,'Elizabeth Stone','3321 Castle Spring,Houston,TX');
+
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,22445566,'01-03-2005','01-05-2005',1,2,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,78123100,'09-07-2006','09-08-2006',0,6,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,31234567,'10-03-2006','10-06-2006',0,1,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,01563221,'10-07-2020','15-07-2020',1,10,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,35610290,'02-09-2020','05-09-2020',0,4,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,69321560,'27-03-2021','27-04-2021',1,7,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,31209765,'30-05-2021','30-05-2022',0,9,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,91256109,'01-01-2020','01-01-2022',0,8,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,12345678,'03-12-2020','15-12-2020',1,3,0);
+INSERT INTO BORROWS VALUES(borrows_seq.nextval,33556677,'17-09-2021','29-10-2021',0,5,0);
