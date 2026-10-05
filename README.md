@@ -12,7 +12,6 @@ Oracle **PL/SQL** coursework: relational schema design, analytical SQL on retail
 
 | Folder | Topic | Main artifacts |
 |--------|--------|----------------|
-| [`ergasia-01/`](ergasia-01/) | 1st assignment — schema design | Assignment brief (PDF), `Projection.docx`, `projection1.docx` |
 | [`ergasia-02/`](ergasia-02/) | 2nd assignment — **XSALES** analytics | `2hergasia.sql`, `report_ergasia_02.pdf`, brief PDF |
 | [`ergasia-03/`](ergasia-03/) | 3rd assignment — **library system** | SQL scripts, `3η_ομαδικη_βασεις_δεδομενων.pdf` (report), brief PDF |
 | [`labs/`](labs/) | Query optimizer lab | `optimizer.sql` (`EXPLAIN PLAN`, indexes) |
@@ -25,7 +24,6 @@ Run scripts in **Oracle SQL Developer** or SQL\*Plus against a schema with acces
 ## Repository layout
 
 ```
-ergasia-01/     # 1st assignment PDF
 ergasia-02/     # 2nd assignment SQL + brief
 ergasia-03/     # 3rd assignment SQL scripts + brief
 labs/           # Optimizer exercises
